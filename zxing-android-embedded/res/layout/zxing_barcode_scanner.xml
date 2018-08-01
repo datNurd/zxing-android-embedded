@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.journeyapps.barcodescanner.BarcodeView
         android:layout_width="match_parent"
@@ -18,4 +19,14 @@
               android:background="@color/zxing_transparent"
               android:text="@string/zxing_msg_default_status"
               android:textColor="@color/zxing_status_text"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/take_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|right"
+        android:onClick="captureImage"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_camera"
+        app:useCompatPadding="true" />
 </merge>

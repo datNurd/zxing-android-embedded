@@ -10,16 +10,21 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.google.zxing.ResultMetadataType;
 import com.google.zxing.ResultPoint;
@@ -27,6 +32,7 @@ import com.google.zxing.client.android.BeepManager;
 import com.google.zxing.client.android.InactivityTimer;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.R;
+import com.journeyapps.barcodescanner.camera.PreviewCallback;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,6 +75,26 @@ public class CaptureManager {
     private Handler handler;
 
     private boolean finishWhenClosed = false;
+
+    private PreviewCallback previewCallback = new PreviewCallback() {
+        @Override
+        public void onPreview(final SourceData sourceData) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Rect rect= new Rect(0,0,sourceData.getDataWidth(),sourceData.getDataHeight());
+                    sourceData.setCropRect(rect);
+                    BarcodeResult rawresult = new BarcodeResult(null,sourceData);
+                    returnResultTimeout(rawresult);
+                }
+            });
+        }
+
+        @Override
+        public void onPreviewError(Exception e) {
+
+        }
+    };
 
     private BarcodeCallback callback = new BarcodeCallback() {
         @Override
@@ -175,7 +201,10 @@ public class CaptureManager {
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
-                        returnResultTimeout();
+                        barcodeView.getBarcodeView().stopDecoding();
+                        Toast.makeText(activity.getApplicationContext(),"Unable to Auto-Scan, Please click a picture manually.",Toast.LENGTH_LONG).show();
+                        barcodeView.getViewFinder().setVisibility(View.INVISIBLE);
+                        barcodeView.showCaptureButton(previewCallback);
                     }
                 };
                 handler.postDelayed(runnable, intent.getLongExtra(Intents.Scan.TIMEOUT, 0L));
@@ -309,33 +338,35 @@ public class CaptureManager {
     public static Intent resultIntent(BarcodeResult rawResult, String barcodeImagePath) {
         Intent intent = new Intent(Intents.Scan.ACTION);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        intent.putExtra(Intents.Scan.RESULT, rawResult.toString());
-        intent.putExtra(Intents.Scan.RESULT_FORMAT, rawResult.getBarcodeFormat().toString());
-        byte[] rawBytes = rawResult.getRawBytes();
-        if (rawBytes != null && rawBytes.length > 0) {
-            intent.putExtra(Intents.Scan.RESULT_BYTES, rawBytes);
-        }
-        Map<ResultMetadataType, ?> metadata = rawResult.getResultMetadata();
-        if (metadata != null) {
-            if (metadata.containsKey(ResultMetadataType.UPC_EAN_EXTENSION)) {
-                intent.putExtra(Intents.Scan.RESULT_UPC_EAN_EXTENSION,
-                        metadata.get(ResultMetadataType.UPC_EAN_EXTENSION).toString());
+        if(rawResult.getResult() != null) {
+            intent.putExtra(Intents.Scan.RESULT, rawResult.toString());
+            intent.putExtra(Intents.Scan.RESULT_FORMAT, rawResult.getBarcodeFormat().toString());
+            byte[] rawBytes = rawResult.getRawBytes();
+            if (rawBytes != null && rawBytes.length > 0) {
+                intent.putExtra(Intents.Scan.RESULT_BYTES, rawBytes);
             }
-            Number orientation = (Number) metadata.get(ResultMetadataType.ORIENTATION);
-            if (orientation != null) {
-                intent.putExtra(Intents.Scan.RESULT_ORIENTATION, orientation.intValue());
-            }
-            String ecLevel = (String) metadata.get(ResultMetadataType.ERROR_CORRECTION_LEVEL);
-            if (ecLevel != null) {
-                intent.putExtra(Intents.Scan.RESULT_ERROR_CORRECTION_LEVEL, ecLevel);
-            }
-            @SuppressWarnings("unchecked")
-            Iterable<byte[]> byteSegments = (Iterable<byte[]>) metadata.get(ResultMetadataType.BYTE_SEGMENTS);
-            if (byteSegments != null) {
-                int i = 0;
-                for (byte[] byteSegment : byteSegments) {
-                    intent.putExtra(Intents.Scan.RESULT_BYTE_SEGMENTS_PREFIX + i, byteSegment);
-                    i++;
+            Map<ResultMetadataType, ?> metadata = rawResult.getResultMetadata();
+            if (metadata != null) {
+                if (metadata.containsKey(ResultMetadataType.UPC_EAN_EXTENSION)) {
+                    intent.putExtra(Intents.Scan.RESULT_UPC_EAN_EXTENSION,
+                            metadata.get(ResultMetadataType.UPC_EAN_EXTENSION).toString());
+                }
+                Number orientation = (Number) metadata.get(ResultMetadataType.ORIENTATION);
+                if (orientation != null) {
+                    intent.putExtra(Intents.Scan.RESULT_ORIENTATION, orientation.intValue());
+                }
+                String ecLevel = (String) metadata.get(ResultMetadataType.ERROR_CORRECTION_LEVEL);
+                if (ecLevel != null) {
+                    intent.putExtra(Intents.Scan.RESULT_ERROR_CORRECTION_LEVEL, ecLevel);
+                }
+                @SuppressWarnings("unchecked")
+                Iterable<byte[]> byteSegments = (Iterable<byte[]>) metadata.get(ResultMetadataType.BYTE_SEGMENTS);
+                if (byteSegments != null) {
+                    int i = 0;
+                    for (byte[] byteSegment : byteSegments) {
+                        intent.putExtra(Intents.Scan.RESULT_BYTE_SEGMENTS_PREFIX + i, byteSegment);
+                        i++;
+                    }
                 }
             }
         }
@@ -355,6 +386,7 @@ public class CaptureManager {
     private String getBarcodeImagePath(BarcodeResult rawResult) {
         String barcodeImagePath = null;
         if (returnBarcodeImagePath) {
+            Log.d("CaptureManager","Inside if");
             Bitmap bmp = rawResult.getBitmap();
             try {
                 File bitmapFile = File.createTempFile("barcodeimage", ".jpg", activity.getCacheDir());
@@ -368,6 +400,7 @@ public class CaptureManager {
         }
         return barcodeImagePath;
     }
+
 
     private void finish() {
         activity.finish();
@@ -384,10 +417,13 @@ public class CaptureManager {
         inactivityTimer.cancel();
     }
 
-    protected void returnResultTimeout() {
-        Intent intent = new Intent(Intents.Scan.ACTION);
-        intent.putExtra(Intents.Scan.TIMEOUT, true);
-        activity.setResult(Activity.RESULT_CANCELED, intent);
+    protected void returnResultTimeout(BarcodeResult rawResult) {
+//        Intent intent = new Intent(Intents.Scan.ACTION);
+//        intent.putExtra(Intents.Scan.TIMEOUT, true);
+//        activity.setResult(Activity.RESULT_CANCELED, intent);
+//        closeAndFinish();
+        Intent intent = resultIntent(rawResult, getBarcodeImagePath(rawResult));
+        activity.setResult(Activity.RESULT_OK, intent);
         closeAndFinish();
     }
 

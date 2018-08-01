@@ -3,8 +3,13 @@ package com.journeyapps.barcodescanner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Camera;
+import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -16,8 +21,10 @@ import com.google.zxing.client.android.DecodeFormatManager;
 import com.google.zxing.client.android.DecodeHintManager;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.R;
+import com.journeyapps.barcodescanner.camera.CameraInstance;
 import com.journeyapps.barcodescanner.camera.CameraParametersCallback;
 import com.journeyapps.barcodescanner.camera.CameraSettings;
+import com.journeyapps.barcodescanner.camera.PreviewCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +39,7 @@ public class DecoratedBarcodeView extends FrameLayout {
     private BarcodeView barcodeView;
     private ViewfinderView viewFinder;
     private TextView statusView;
+    private FloatingActionButton caputreButton;
 
     /**
      * The instance of @link TorchListener to send events callback.
@@ -74,6 +82,33 @@ public class DecoratedBarcodeView extends FrameLayout {
         initialize(attrs);
     }
 
+
+
+    public void captureImage(View v){
+        CameraInstance cameraInstance = barcodeView.getCameraInstance();
+    }
+    public void showCaptureButton(PreviewCallback previewCallback){
+        caputreButton = findViewById(R.id.take_picture);
+        OnCaptureClickCallback clickCallback = new OnCaptureClickCallback();
+        clickCallback.setCallback(previewCallback);
+        caputreButton.setOnClickListener(clickCallback);
+        caputreButton.show();
+    }
+
+    private final class OnCaptureClickCallback implements View.OnClickListener{
+        public OnCaptureClickCallback() {
+        }
+        private PreviewCallback callback;
+        public void setCallback(PreviewCallback callback) {
+            this.callback = callback;
+        }
+        @Override
+        public void onClick(View v){
+            CameraInstance cameraInstance = barcodeView.getCameraInstance();
+            cameraInstance.requestPreview(this.callback);
+        }
+    }
+
     /**
      * Initialize the view with the xml configuration based on styleable attributes.
      *
@@ -98,9 +133,9 @@ public class DecoratedBarcodeView extends FrameLayout {
                 "with the id \"zxing_barcode_surface\".");
         }
 
+
         // Pass on any preview-related attributes
         barcodeView.initializeAttributes(attrs);
-
 
         viewFinder = (ViewfinderView) findViewById(R.id.zxing_viewfinder_view);
 
