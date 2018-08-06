@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="400dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:scrollbars="vertical"
+    android:background="@color/zxing_dilaog_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:clickable="true"
+            android:id="@+id/closeButton"/>
+
+        <TextView
+            android:text="How it works"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/text"
+            android:textStyle="normal|bold"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textColor="@color/zxing_status_text"
+            android:layout_gravity="center"
+            android:background="@drawable/popup_gradiant"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/documents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="left"
+                android:textColor="#34495e"
+                android:text="   1. Place the front side of your original Aadhar ID in the view." />
+
+            <TextView
+                android:id="@+id/signdocument"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/documents"
+                android:layout_below="@+id/documents"
+                android:layout_marginTop="10dp"
+                android:gravity="left"
+                android:textColor="#34495e"
+                android:text="  2. The app will auto scan the Aadhar ID with in 10 sec." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/notefornotedocument"
+                android:layout_below="@+id/notefornotedocument"
+                android:layout_marginTop="10dp"
+                android:gravity="left"
+                android:textColor="#34495e"
+                android:text="  3. If app fails to auto scan in 10 sec, it will transform to manual mode."
+                android:id="@+id/signdocumentcopy"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/notefornotedocument"
+                android:layout_below="@+id/notefornotedocument"
+                android:layout_marginTop="20dp"
+                android:gravity="left"
+                android:textColor="#34495e"
+                android:text="  4. In manual mode, manually click a picture of the Aadhar ID."
+                android:id="@+id/signdocumen"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialogButtonOK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingRight="21dp"
+            android:paddingLeft="21dp"
+            android:text="OK GOT IT"
+            android:textSize="15sp"
+            android:textColor="@color/zxing_status_text"
+            android:background="@drawable/zxing_rounded_button_corners"
+            tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+    </LinearLayout>
+</ScrollView>
