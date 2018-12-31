@@ -29,6 +29,7 @@
             android:id="@+id/text"
             android:textStyle="normal|bold"
             android:textSize="13sp"
+            android:visibility="gone"
             android:gravity="center"
             android:textColor="@color/zxing_status_text"
             android:layout_gravity="center"
@@ -48,7 +49,7 @@
                 android:layout_marginTop="15dp"
                 android:gravity="left"
                 android:textColor="#34495e"
-                android:text="   1. Place the front side of your original Aadhar ID in the view." />
+                android:text="   1. Place your camera focus on the QR code of your\n       Aadhaar." />
 
             <TextView
                 android:id="@+id/signdocument"
@@ -59,7 +60,7 @@
                 android:layout_marginTop="10dp"
                 android:gravity="left"
                 android:textColor="#34495e"
-                android:text="  2. The app will auto scan the Aadhar ID with in 10 sec." />
+                android:text="  2. If the scan does not work within 10 secs , you can\n      manually click a picture of the Aadhar." />
 
             <TextView
                 android:layout_width="match_parent"
@@ -68,6 +69,7 @@
                 android:layout_below="@+id/notefornotedocument"
                 android:layout_marginTop="10dp"
                 android:gravity="left"
+                android:visibility="gone"
                 android:textColor="#34495e"
                 android:text="  3. If app fails to auto scan in 10 sec, it will transform to manual mode."
                 android:id="@+id/signdocumentcopy"/>
@@ -79,6 +81,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="left"
                 android:textColor="#34495e"
+                android:visibility="gone"
                 android:text="  4. In manual mode, manually click a picture of the Aadhar ID."
                 android:id="@+id/signdocumen"/>
         </LinearLayout>
