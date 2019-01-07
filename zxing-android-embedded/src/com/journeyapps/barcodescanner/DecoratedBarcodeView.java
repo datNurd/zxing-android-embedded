@@ -105,7 +105,12 @@ public class DecoratedBarcodeView extends FrameLayout {
         @Override
         public void onClick(View v){
             CameraInstance cameraInstance = barcodeView.getCameraInstance();
-            cameraInstance.requestPreview(this.callback);
+            try {
+                cameraInstance.requestPreview(this.callback);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -129,8 +134,8 @@ public class DecoratedBarcodeView extends FrameLayout {
 
         if (barcodeView == null) {
             throw new IllegalArgumentException(
-                "There is no a com.journeyapps.barcodescanner.BarcodeView on provided layout " +
-                "with the id \"zxing_barcode_surface\".");
+                    "There is no a com.journeyapps.barcodescanner.BarcodeView on provided layout " +
+                            "with the id \"zxing_barcode_surface\".");
         }
 
 
@@ -141,8 +146,8 @@ public class DecoratedBarcodeView extends FrameLayout {
 
         if (viewFinder == null) {
             throw new IllegalArgumentException(
-                "There is no a com.journeyapps.barcodescanner.ViewfinderView on provided layout " +
-                "with the id \"zxing_viewfinder_view\".");
+                    "There is no a com.journeyapps.barcodescanner.ViewfinderView on provided layout " +
+                            "with the id \"zxing_viewfinder_view\".");
         }
 
         viewFinder.setCameraPreview(barcodeView);
